@@ -10,6 +10,8 @@ After the first push to `main`, the GitHub Actions workflow deploys
 `hostel_booking_frontend/` to GitHub Pages. Enable Pages with **GitHub Actions**
 as the build and deployment source in the repository settings if prompted.
 
+Published site: https://sofiyanbagwan20.github.io/staynest-hostel-booking/
+
 ## Run the frontend locally
 
 Open `hostel_booking_frontend/index.html` in a browser, or serve the folder:
