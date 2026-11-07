@@ -1,0 +1,438 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Find and save student hostels near your college." />
+  <title>StayNest — Find your next stay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="StayNest home"><span class="brand-mark">S</span><span>stay<span class="brand-accent">nest</span></span></a>
+    <nav class="desktop-nav" aria-label="Main navigation">
+      <a class="nav-link active" id="navExplore" href="#home">Explore</a>
+      <a class="nav-link" id="navSaved" href="#saved">Saved</a>
+      <a class="nav-link" id="navBookings" href="#bookings">My bookings</a>
+    </nav>
+    <div class="top-actions">
+      <button class="icon-btn" id="notificationBtn" aria-label="Notifications">♧<i></i></button>
+      <button class="profile-btn" id="profileBtn">
+        <span class="avatar" id="userAvatar">A</span>
+        <span class="profile-name" id="userNameDisplay">My account</span>
+        <span class="chevron">⌄</span>
+      </button>
+    </div>
+  </header>
+
+  <main id="home" class="page-shell">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="eyebrow-dot"></span> YOUR NEXT CHAPTER STARTS HERE</p>
+        <h1>Find a place<br>to <span>feel at home.</span></h1>
+        <p class="hero-text">Comfortable, verified hostels for students and young professionals. Your new home is closer than you think.</p>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="sun"></div>
+        <div class="art-building building-one"><span></span><span></span><span></span><span></span></div>
+        <div class="art-building building-two"><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="art-plant">♣</div>
+        <div class="art-card"><span class="art-card-icon">⌂</span><span><b>Find your space</b><small>Make it yours.</small></span></div>
+      </div>
+    </section>
+
+    <section class="search-panel" aria-label="Search hostels">
+      <label class="search-field">
+        <span class="field-icon">⌕</span>
+        <span class="field-copy"><small>LOCATION</small><input id="locationInput" type="text" placeholder="City, college or area" /></span>
+      </label>
+      <span class="search-divider"></span>
+      <label class="search-field">
+        <span class="field-icon">♙</span>
+        <span class="field-copy">
+          <small>STAY TYPE</small>
+          <select id="typeFilter">
+            <option value="all">Any type</option>
+            <option value="Girls">Girls hostel</option>
+            <option value="Boys">Boys hostel</option>
+            <option value="Co-living">Co-living</option>
+          </select>
+        </span>
+      </label>
+      <span class="search-divider"></span>
+      <label class="search-field">
+        <span class="field-icon">₹</span>
+        <span class="field-copy">
+          <small>MONTHLY BUDGET</small>
+          <select id="budgetFilter">
+            <option value="all">Any budget</option>
+            <option value="5000">Under ₹5,000</option>
+            <option value="8000">Under ₹8,000</option>
+            <option value="12000">Under ₹12,000</option>
+          </select>
+        </span>
+      </label>
+      <button class="search-btn" id="searchBtn"><span>⌕</span> Search stays</button>
+    </section>
+
+    <div class="content-grid">
+      <section class="listing-area">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow muted">HANDPICKED FOR YOU</p>
+            <h2>Explore stays <span id="resultCount" class="count-pill">0</span></h2>
+            <p class="section-subtitle">Spaces that fit your life, and your budget.</p>
+          </div>
+          <button class="filter-btn" id="filterToggle">☷ <span>Filters</span></button>
+        </div>
+        <div class="filter-row" id="quickFilters">
+          <button class="chip selected" data-chip="all">All stays</button>
+          <button class="chip" data-chip="verified">✓ Verified</button>
+          <button class="chip" data-chip="wifi">Wi-Fi</button>
+          <button class="chip" data-chip="meals">Meals included</button>
+          <button class="chip" data-chip="ac">Air conditioning</button>
+        </div>
+        <div class="hostel-grid" id="hostelGrid"></div>
+        <div class="empty-state hidden" id="emptyState">
+          <div class="empty-icon">⌕</div>
+          <h3>No stays found</h3>
+          <p>Try changing your search or filters.</p>
+          <button class="outline-btn" id="clearFilters">Clear filters</button>
+        </div>
+      </section>
+      <aside class="map-panel">
+        <div class="map-top">
+          <div>
+            <h3>Stay around you</h3>
+            <p>Explore popular areas</p>
+          </div>
+          <button class="map-expand" id="mapExpand" aria-label="Expand map">⛶</button>
+        </div>
+        <div class="fake-map" id="fakeMap">
+          <div class="map-water"></div>
+          <div class="road road-a"></div>
+          <div class="road road-b"></div>
+          <div class="road road-c"></div>
+          <div class="park park-a">GREEN PARK</div>
+          <div class="map-label label-a">University Rd</div>
+          <div class="map-label label-b">Central Avenue</div>
+          <button class="map-pin pin-a" data-hostel="1">₹6.5k</button>
+          <button class="map-pin pin-b" data-hostel="2">₹8k</button>
+          <button class="map-pin pin-c" data-hostel="3">₹5.5k</button>
+          <button class="map-pin pin-d" data-hostel="4">₹9k</button>
+          <button class="map-pin pin-e" data-hostel="5">₹7.2k</button>
+          <div class="map-legend"><span></span> Popular student areas</div>
+        </div>
+        <button class="map-link" id="showMapBtn">Explore on map <span>↗</span></button>
+      </aside>
+    </div>
+
+    <section class="bottom-banner">
+      <div class="banner-icon">✦</div>
+      <div>
+        <h3>Have a place to share?</h3>
+        <p>List your hostel and connect with your next residents.</p>
+      </div>
+      <button id="listHostelBtn">List your property <span>→</span></button>
+    </section>
+  </main>
+
+  <nav class="mobile-nav" aria-label="Mobile navigation">
+    <a class="active" href="#home" id="mobileHome"><span>⌂</span>Explore</a>
+    <a href="#saved" id="mobileSaved"><span>♡</span>Saved</a>
+    <a href="#bookings" id="mobileBookings"><span>▤</span>Bookings</a>
+    <a href="#profile" id="mobileProfile"><span>♙</span>Profile</a>
+  </nav>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- Detail Modal -->
+  <dialog class="modal" id="detailModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div id="modalContent"></div>
+  </dialog>
+
+  <!-- Info Modal -->
+  <dialog class="modal small-modal" id="infoModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div id="infoContent"></div>
+  </dialog>
+
+  <!-- Auth Modal (Login / Sign Up) -->
+  <dialog class="modal small-modal" id="authModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div class="tab-group" id="authTabs">
+      <button class="tab-btn active" id="tabLoginBtn" type="button">Sign In</button>
+      <button class="tab-btn" id="tabRegisterBtn" type="button">Create Account</button>
+    </div>
+    
+    <!-- Login Form -->
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="loginEmail">Email address</label>
+        <input class="form-control" type="email" id="loginEmail" required placeholder="name@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="loginPassword">Password</label>
+        <input class="form-control" type="password" id="loginPassword" required placeholder="Enter your password" />
+      </div>
+      <button class="primary-wide" type="submit" id="submitLoginBtn">Sign In</button>
+    </form>
+
+    <!-- Register Form -->
+    <form id="registerForm" class="hidden">
+      <div class="form-group">
+        <label for="regName">Full Name</label>
+        <input class="form-control" type="text" id="regName" required placeholder="e.g. Priya Sharma" />
+      </div>
+      <div class="form-group">
+        <label for="regEmail">Email address</label>
+        <input class="form-control" type="email" id="regEmail" required placeholder="name@example.com" />
+      </div>
+      <div class="form-group">
+        <label for="regPhone">Phone Number</label>
+        <input class="form-control" type="tel" id="regPhone" placeholder="+91 98765 43210" />
+      </div>
+      <div class="form-group">
+        <label for="regRole">I am a</label>
+        <select class="form-control" id="regRole">
+          <option value="student">Student / Working Professional</option>
+          <option value="owner">Hostel Owner / Manager</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="regPassword">Password (min 6 chars)</label>
+        <input class="form-control" type="password" id="regPassword" required minlength="6" placeholder="Choose a secure password" />
+      </div>
+      <button class="primary-wide" type="submit" id="submitRegisterBtn">Create Account</button>
+    </form>
+  </dialog>
+
+  <!-- User Account Dropdown / Profile Modal -->
+  <dialog class="modal small-modal" id="userProfileModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div style="text-align:center;padding:10px 0">
+      <div class="avatar" id="modalUserAvatar" style="width:55px;height:55px;font-size:22px;margin:0 auto 12px">U</div>
+      <h3 id="modalUserName" style="margin:0 0 4px">User Name</h3>
+      <p id="modalUserEmail" style="font-size:12px;color:#7e8b82;margin:0 0 16px">user@example.com</p>
+      <div class="payment-box" style="text-align:left;font-size:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span>Role:</span><b id="modalUserRole">Student</b></div>
+        <div style="display:flex;justify-content:space-between"><span>Phone:</span><b id="modalUserPhone">+91-</b></div>
+      </div>
+      <button class="outline-btn" style="width:100%;margin-bottom:8px" id="viewBookingsBtn">View My Bookings</button>
+      <button class="outline-btn" style="width:100%;color:#c84b4b;border-color:#f1caca" id="logoutBtn">Sign Out</button>
+    </div>
+  </dialog>
+
+  <!-- Booking Modal -->
+  <dialog class="modal" id="bookingModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <h2>Confirm Booking</h2>
+    <p id="bookingHostelTitle" style="color:var(--green);font-weight:700;margin-top:-6px"></p>
+    <form id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="checkInDate">Check-in Date</label>
+          <input class="form-control" type="date" id="checkInDate" required />
+        </div>
+        <div class="form-group">
+          <label for="durationMonths">Duration</label>
+          <select class="form-control" id="durationMonths">
+            <option value="1">1 Month</option>
+            <option value="3">3 Months</option>
+            <option value="6">6 Months</option>
+            <option value="12">12 Months (1 Year)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="guestName">Guest Name</label>
+        <input class="form-control" type="text" id="guestName" required />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="guestPhone">Contact Phone</label>
+          <input class="form-control" type="tel" id="guestPhone" required placeholder="+91 98765 43210" />
+        </div>
+        <div class="form-group">
+          <label for="guestEmail">Email for Confirmation</label>
+          <input class="form-control" type="email" id="guestEmail" required />
+        </div>
+      </div>
+      <div class="payment-box">
+        <div class="payment-summary">
+          <div>
+            <div style="font-weight:700">Total Payable Amount</div>
+            <small style="color:#77857b" id="bookingDurationCalc">1 month @ ₹0</small>
+          </div>
+          <div class="payment-amount" id="bookingTotalPayable">₹0</div>
+        </div>
+        <div style="font-size:11px;color:#5a6d61">✓ Secure Razorpay 256-bit SSL encrypted checkout</div>
+      </div>
+      <button class="primary-wide" type="submit" id="proceedToPayBtn">Proceed to Secure Payment →</button>
+    </form>
+  </dialog>
+
+  <!-- Secure Payment Gateway Modal (Razorpay Test Mode) -->
+  <dialog class="modal" id="paymentModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div>
+        <h3 style="margin:0;font-size:17px;font-family:Manrope,sans-serif">Razorpay Secure Checkout</h3>
+        <span style="font-size:10px;color:var(--green);font-weight:700">TEST ENVIRONMENT</span>
+      </div>
+      <div class="payment-amount" id="checkoutAmountDisplay" style="font-size:20px">₹0</div>
+    </div>
+
+    <div class="test-hint-pill" id="autoFillCardBtn" title="Click to fill test card">
+      <span>⚡ Auto-fill Test Card Details</span>
+    </div>
+
+    <div class="tab-group" id="paymentMethodTabs">
+      <button class="tab-btn active" id="payMethodCard" type="button">Card</button>
+      <button class="tab-btn" id="payMethodUpi" type="button">UPI / QR</button>
+      <button class="tab-btn" id="payMethodNetBanking" type="button">Net Banking</button>
+    </div>
+
+    <!-- Card Payment Panel -->
+    <form id="cardPaymentForm">
+      <div class="form-group">
+        <label for="cardNumber">Card Number</label>
+        <input class="form-control" type="text" id="cardNumber" placeholder="4111 2222 3333 4444" maxlength="19" required />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="cardExpiry">Valid Thru (MM/YY)</label>
+          <input class="form-control" type="text" id="cardExpiry" placeholder="12/28" maxlength="5" required />
+        </div>
+        <div class="form-group">
+          <label for="cardCvv">CVV</label>
+          <input class="form-control" type="password" id="cardCvv" placeholder="123" maxlength="3" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cardName">Cardholder Name</label>
+        <input class="form-control" type="text" id="cardName" placeholder="Cardholder Name" required />
+      </div>
+      <button class="primary-wide" type="submit" id="payNowBtn" style="background:#0c2340;margin-top:14px">
+        Pay Securely with Razorpay
+      </button>
+    </form>
+
+    <!-- UPI Payment Panel -->
+    <form id="upiPaymentForm" class="hidden">
+      <div class="form-group">
+        <label for="upiId">Enter UPI ID (e.g. name@okhdfcbank / success@razorpay)</label>
+        <input class="form-control" type="text" id="upiId" placeholder="student@upi" value="student@okhdfcbank" required />
+      </div>
+      <div style="text-align:center;padding:12px;background:#f3f7f4;border-radius:10px;margin-bottom:12px">
+        <div style="font-size:32px">📱</div>
+        <small style="color:#5e7266">Open your UPI App (GPay, PhonePe, Paytm) to approve simulation</small>
+      </div>
+      <button class="primary-wide" type="submit" id="payNowUpiBtn" style="background:#0c2340">
+        Verify & Pay via UPI
+      </button>
+    </form>
+
+    <!-- Net Banking Panel -->
+    <form id="netBankingForm" class="hidden">
+      <div class="form-group">
+        <label for="bankSelect">Select Bank</label>
+        <select class="form-control" id="bankSelect">
+          <option value="HDFC">HDFC Bank</option>
+          <option value="ICICI">ICICI Bank</option>
+          <option value="SBI">State Bank of India</option>
+          <option value="AXIS">Axis Bank</option>
+          <option value="KOTAK">Kotak Mahindra Bank</option>
+        </select>
+      </div>
+      <button class="primary-wide" type="submit" id="payNowBankBtn" style="background:#0c2340">
+        Authorize via Net Banking
+      </button>
+    </form>
+    <p style="font-size:10px;text-align:center;color:#859288;margin:12px 0 0">🛡️ 100% Secure PCI-DSS Level 1 Compliant payment simulation with SHA-256 HMAC verification.</p>
+  </dialog>
+
+  <!-- Payment Receipt Modal -->
+  <dialog class="modal small-modal" id="receiptModal">
+    <div style="text-align:center;padding-top:10px">
+      <div class="receipt-check">✓</div>
+      <h2 style="margin:0 0 5px">Booking Confirmed!</h2>
+      <p style="margin:0 0 15px;font-size:12px">Payment verified successfully.</p>
+    </div>
+    <div class="receipt-card" id="receiptCardContent"></div>
+    <button class="primary-wide" id="receiptDoneBtn">Done</button>
+    <button class="outline-btn" style="width:100%;margin-top:8px" id="receiptViewBookingsBtn">View All Bookings</button>
+  </dialog>
+
+  <!-- My Bookings Modal -->
+  <dialog class="modal large-modal" id="myBookingsModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <h2>My Bookings</h2>
+    <p style="font-size:12px;margin-top:-6px;color:#7e8b82">Track your current and previous hostel bookings.</p>
+    <div id="bookingsListContainer" style="margin-top:16px;max-height:55vh;overflow-y:auto"></div>
+  </dialog>
+
+  <!-- List Property Modal -->
+  <dialog class="modal" id="listingModal">
+    <form method="dialog"><button class="modal-close" aria-label="Close">×</button></form>
+    <h2>List Your Property</h2>
+    <p style="font-size:12px;margin-top:-6px;color:#7e8b82">Add your hostel to StayNest and connect with prospective students.</p>
+    <form id="createHostelForm">
+      <div class="form-group">
+        <label for="newHostelName">Hostel / Property Name</label>
+        <input class="form-control" type="text" id="newHostelName" required placeholder="e.g. Royal Heights Student Living" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="newHostelType">Property Type</label>
+          <select class="form-control" id="newHostelType">
+            <option value="Co-living">Co-living</option>
+            <option value="Girls">Girls Hostel</option>
+            <option value="Boys">Boys Hostel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="newHostelPrice">Monthly Rent (₹)</label>
+          <input class="form-control" type="number" id="newHostelPrice" required placeholder="e.g. 7500" min="1000" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="newHostelArea">Area / Locality</label>
+          <input class="form-control" type="text" id="newHostelArea" required placeholder="e.g. Kothrud, Pune" />
+        </div>
+        <div class="form-group">
+          <label for="newHostelCity">City</label>
+          <input class="form-control" type="text" id="newHostelCity" value="Pune" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Included Amenities</label>
+        <div class="checkbox-grid">
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="Wi-Fi" checked /> Wi-Fi</label>
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="Meals" checked /> Meals</label>
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="AC" /> Air Conditioning</label>
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="Laundry" checked /> Laundry</label>
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="Security" checked /> 24/7 Security</label>
+          <label class="checkbox-label"><input type="checkbox" name="amenities" value="Gym" /> Gym / Fitness</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="newHostelImage">Image URL</label>
+        <input class="form-control" type="url" id="newHostelImage" placeholder="https://images.unsplash.com/..." value="https://images.unsplash.com/photo-1555854877-bab0e564b8d5?auto=format&fit=crop&w=900&q=80" />
+      </div>
+      <div class="form-group">
+        <label for="newHostelDesc">Property Description</label>
+        <textarea class="form-control" id="newHostelDesc" rows="3" placeholder="Describe room amenities, proximity to colleges, house rules..."></textarea>
+      </div>
+      <button class="primary-wide" type="submit" id="submitListingBtn">Publish Property Listing</button>
+    </form>
+  </dialog>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
