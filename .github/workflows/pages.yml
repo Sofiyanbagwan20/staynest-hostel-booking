@@ -25,6 +25,24 @@ jobs:
         uses: actions/checkout@v4
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
+      - name: Configure frontend API URL
+        env:
+          STAYNEST_API_BASE_URL: ${{ vars.STAYNEST_API_BASE_URL }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const value = (process.env.STAYNEST_API_BASE_URL || '').trim().replace(/\/+$/, '');
+          if (value) {
+            const url = new URL(value);
+            if (url.protocol !== 'https:' || !url.pathname.endsWith('/api')) {
+              throw new Error('STAYNEST_API_BASE_URL must be an HTTPS URL ending in /api');
+            }
+          }
+          fs.writeFileSync(
+            'hostel_booking_frontend/js/runtime-config.js',
+            `window.STAYNEST_API_BASE_URL = ${JSON.stringify(value)};\n`
+          );
+          NODE
       - name: Upload frontend artifact
         uses: actions/upload-pages-artifact@v3
         with:

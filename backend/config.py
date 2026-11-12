@@ -12,6 +12,7 @@ if env_path.exists():
                 key, val = line.split("=", 1)
                 os.environ.setdefault(key.strip(), val.strip())
 
+DB_ENGINE = os.getenv("DB_ENGINE", "sqlite").lower()
 DB_HOST = os.getenv("DB_HOST", "127.0.0.1")
 DB_PORT = int(os.getenv("DB_PORT", "3306"))
 DB_USER = os.getenv("DB_USER", "root")

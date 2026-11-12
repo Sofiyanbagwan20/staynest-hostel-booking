@@ -32,3 +32,26 @@ Then visit `http://localhost:8000`.
 
 The backend is not part of the GitHub Pages deployment. Never commit `.env`,
 database files, or real credentials.
+
+## Deploy the backend and connect GitHub Pages
+
+GitHub Pages hosts only the static frontend. It cannot reach a backend at
+`127.0.0.1`; that address refers to the visitor's own computer. To enable
+accounts, saved stays, bookings, and payments online:
+
+1. Deploy the backend using the included `render.yaml` blueprint. Review
+   Render's plan and billing before confirming deployment. The blueprint uses
+   a persistent disk for the SQLite database and generates a `JWT_SECRET`.
+2. After deployment, copy the backend's public URL, such as
+   `https://staynest-api.onrender.com`, and verify
+   `https://staynest-api.onrender.com/api/health` returns an online status.
+3. In the GitHub repository, open **Settings → Secrets and variables →
+   Actions → Variables**, add `STAYNEST_API_BASE_URL` with the full HTTPS API
+   base URL (for example `https://staynest-api.onrender.com/api`), then
+   re-run the **Deploy frontend to GitHub Pages** workflow.
+
+The Pages workflow writes that variable into a generated runtime config when
+it builds the site. If the variable is missing, the frontend remains a static
+demo and reports that online backend features are not configured. The backend
+URL is public configuration, not a secret; do not put credentials or API
+secrets in it.

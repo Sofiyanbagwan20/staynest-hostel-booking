@@ -1,7 +1,102 @@
 // StayNest Frontend - Fullstack API & Razorpay Payment Integration
-const API_BASE = (window.location.port === '5000' || window.location.pathname.startsWith('/api'))
-  ? '/api'
-  : 'http://127.0.0.1:5000/api';
+const configuredApiBase = typeof window.STAYNEST_API_BASE_URL === 'string'
+  ? window.STAYNEST_API_BASE_URL.trim().replace(/\/+$/, '')
+  : '';
+const isLocalHost = window.location.protocol === 'file:' ||
+  ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const API_BASE = configuredApiBase ||
+  (window.location.port === '5000' || window.location.pathname.startsWith('/api')
+    ? '/api'
+    : isLocalHost
+      ? 'http://127.0.0.1:5000/api'
+      : '');
+
+const DEFAULT_HOSTELS = [
+  {
+    id: 1,
+    name: "Greenwood Student Living",
+    type: "Girls",
+    area: "Shivajinagar, Pune",
+    city: "Pune",
+    price: 6500,
+    rating: 4.8,
+    reviews: 124,
+    verified: true,
+    features: ["Wi-Fi", "Meals", "AC"],
+    image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?auto=format&fit=crop&w=900&q=80",
+    desc_text: "A bright, comfortable stay with study-friendly spaces, friendly staff and easy access to colleges and public transport."
+  },
+  {
+    id: 2,
+    name: "The Urban Nest",
+    type: "Co-living",
+    area: "Kothrud, Pune",
+    city: "Pune",
+    price: 8000,
+    rating: 4.7,
+    reviews: 98,
+    verified: true,
+    features: ["Wi-Fi", "AC", "Laundry"],
+    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=900&q=80",
+    desc_text: "Modern co-living with thoughtfully furnished rooms, shared common areas and a relaxed community atmosphere."
+  },
+  {
+    id: 3,
+    name: "Sunrise Girls Hostel",
+    type: "Girls",
+    area: "FC Road, Pune",
+    city: "Pune",
+    price: 5500,
+    rating: 4.6,
+    reviews: 86,
+    verified: true,
+    features: ["Wi-Fi", "Meals", "Security"],
+    image: "https://images.unsplash.com/photo-1564078516393-cf04bd966897?auto=format&fit=crop&w=900&q=80",
+    desc_text: "A welcoming girls hostel with secure entry, home-style meals and convenient access to shops and transit."
+  },
+  {
+    id: 4,
+    name: "Oakwood Residency",
+    type: "Boys",
+    area: "Aundh, Pune",
+    city: "Pune",
+    price: 9000,
+    rating: 4.9,
+    reviews: 152,
+    verified: true,
+    features: ["Wi-Fi", "AC", "Gym"],
+    image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=900&q=80",
+    desc_text: "Spacious rooms and useful amenities for students and working professionals looking for a premium stay."
+  },
+  {
+    id: 5,
+    name: "Maple House",
+    type: "Co-living",
+    area: "Viman Nagar, Pune",
+    city: "Pune",
+    price: 7200,
+    rating: 4.5,
+    reviews: 73,
+    verified: false,
+    features: ["Wi-Fi", "Laundry", "Meals"],
+    image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=900&q=80",
+    desc_text: "An affordable, relaxed home base with shared facilities, furnished rooms and easy connections across the city."
+  },
+  {
+    id: 6,
+    name: "Campus Corner Hostel",
+    type: "Boys",
+    area: "Pimpri, Pune",
+    city: "Pune",
+    price: 4800,
+    rating: 4.4,
+    reviews: 61,
+    verified: true,
+    features: ["Wi-Fi", "Meals", "Security"],
+    image: "https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=900&q=80",
+    desc_text: "Budget-friendly rooms close to campus, with everyday essentials and a friendly student community."
+  }
+];
 
 let currentUser = null;
 let authToken = localStorage.getItem('staynest_token') || null;
@@ -35,6 +130,10 @@ function money(n) {
 
 // ----------------- API CLIENT HELPERS -----------------
 async function apiRequest(endpoint, method = 'GET', body = null, requiresAuth = false) {
+  if (!API_BASE) {
+    throw new Error('The online backend is not configured. Set the STAYNEST_API_BASE_URL GitHub Actions variable after deploying the backend.');
+  }
+
   const headers = { 'Content-Type': 'application/json' };
   if (authToken) {
     headers['Authorization'] = `Bearer ${authToken}`;
@@ -189,9 +288,9 @@ document.getElementById('viewBookingsBtn').addEventListener('click', () => {
 
 // ----------------- HOSTELS FETCH & RENDER -----------------
 async function loadHostels() {
-  const q = document.getElementById('locationInput').value.trim();
-  const type = document.getElementById('typeFilter').value;
-  const budget = document.getElementById('budgetFilter').value;
+  const q = (document.getElementById('locationInput')?.value || '').trim();
+  const type = document.getElementById('typeFilter')?.value || 'all';
+  const budget = document.getElementById('budgetFilter')?.value || 'all';
 
   const params = new URLSearchParams();
   if (q) params.append('q', q);
@@ -201,15 +300,49 @@ async function loadHostels() {
 
   try {
     const data = await apiRequest(`/hostels?${params.toString()}`);
-    if (data.success) {
+    if (data && data.success && Array.isArray(data.hostels)) {
       hostels = data.hostels;
       render();
+      return;
     }
   } catch (err) {
-    console.error('Failed to load hostels from backend:', err);
-    // Show fallback message
-    grid.innerHTML = `<div style="grid-column:1/-1;padding:30px;text-align:center;color:#7e8b82">Unable to connect to StayNest MySQL backend at <b>${API_BASE}</b>. Please ensure the Python server is running.</div>`;
+    console.warn('Backend server not connected yet; using local catalog:', err);
   }
+
+  // Graceful catalog fallback if backend is offline or starting
+  let filtered = [...DEFAULT_HOSTELS];
+  if (q) {
+    const qLower = q.toLowerCase();
+    filtered = filtered.filter(h => 
+      h.name.toLowerCase().includes(qLower) || 
+      h.area.toLowerCase().includes(qLower) ||
+      (h.city && h.city.toLowerCase().includes(qLower))
+    );
+  }
+  if (type !== 'all') {
+    filtered = filtered.filter(h => h.type.toLowerCase() === type.toLowerCase());
+  }
+  if (budget !== 'all') {
+    const num = Number(budget);
+    filtered = filtered.filter(h => {
+      if (!isNaN(num) && num > 0) return h.price <= num;
+      if (budget === 'under-6000') return h.price < 6000;
+      if (budget === '6000-8000') return h.price >= 6000 && h.price <= 8000;
+      if (budget === 'above-8000') return h.price > 8000;
+      return true;
+    });
+  }
+  if (activeChip !== 'all') {
+    filtered = filtered.filter(h => {
+      if (activeChip === 'verified') return h.verified;
+      if (activeChip === 'wifi') return (h.features || []).includes('Wi-Fi');
+      if (activeChip === 'meals') return (h.features || []).includes('Meals');
+      if (activeChip === 'ac') return (h.features || []).includes('AC');
+      return true;
+    });
+  }
+  hostels = filtered;
+  render();
 }
 
 async function loadSavedStays() {

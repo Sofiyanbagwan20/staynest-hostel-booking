@@ -1,0 +1,1 @@
+window.STAYNEST_API_BASE_URL = '';
